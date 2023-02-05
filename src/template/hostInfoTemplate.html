@@ -1,0 +1,220 @@
+<!Doctype html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <!--    <link rel="stylesheet" href="../css/style.css" type="text/css">-->
+    <meta http-equiv="refresh" content="15">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Информация об узлах сети</title>
+
+    <style>
+        body{
+            background-color:  #333;
+
+        }
+        .wrap{
+            width: 100%;
+            min-height: 120px;
+        }
+        .wrapper{
+            display: flex;
+            flex-direction: row;
+            justify-content: right;
+        }
+        .forTable{
+            margin:20px;
+            width: 50%;
+            min-height: 120px;
+            padding: 0px;
+            padding-bottom: 40px;
+        }
+        .container {
+            height: 590px;
+            overflow-y: scroll;
+        }
+        .Table{
+            margin: 0px;
+            padding: 0px;
+            width: 120%;
+            min-height: 100px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            background-color: black;
+
+        }
+
+        .upTH{
+            border-bottom: 2px solid black;
+            height: 20px;
+        }
+        .Table_static
+        {
+            margin: 0px;
+            padding: 0px;
+            width: 100%;
+            height: 550px;
+            border-collapse: collapse;
+            border: 2px solid black;
+            background-color: #262626;
+        }
+        th{
+            vertical-align: top;
+            text-align: left;
+            padding: 5px;
+            margin: 0px;
+            width: 33%;
+            color: white;
+
+        }
+        td{
+            vertical-align: middle;
+            text-align: center;
+            padding: 5px;
+            margin: 0px;
+            color:  white;
+        }
+        tr{
+            padding: 0px;
+            margin: 0px;
+            vertical-align: middle;
+            text-align: center;
+
+        }
+        caption
+        {
+            text-align: left;
+            font-size: 30px;
+            background-color: #262626;
+            border-collapse: collapse;
+            color: white;
+            size: 2px;
+            border: 2px solid black;
+        }
+        input{
+            color:  #000;
+            border-radius: 8px;
+            border: 6px solid #262626;
+        }
+
+        spacer{
+            height: 100%;
+        }
+    </style>
+
+    <script>
+        let workArray = []
+        function populateArray(workData){
+            workArray.push(workData)
+            console.log("Работоспособность:  ", workArray)
+        }
+    </script>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="wrapper">
+        <div class="forTable">
+            <div class="container">
+                <table class="Table_static">
+                    <caption>Узлы сети</caption>
+                    {{range .Hosts}}
+                        <td>
+                            <script type="text/javascript">
+                                populateArray({{.Work_calculation}});
+                            </script>
+                            <form action="http://localhost:8080/hosts/{{.Hostid}}">
+                                <button class="btn" style="background-color: #262626">
+                                    {{.Name_host}}
+                                    <p>
+                                        <img src="./images/computer.png" width="150" height="150" alt="//Подгрузить картинку">
+                                    </p>
+                                </button>
+                            </form>
+                        </td>
+                    {{end}}
+                    <script>
+                        let buttons = document.getElementsByClassName('btn')
+                        for (let i = 0; i<buttons.length; i++){
+                            if (workArray[i] == "Частично работоспособен"){
+                                buttons[i].style.backgroundColor = "rgba(255,0,0,0.5)"
+                            }
+                            else{
+                                buttons[i].style.backgroundColor = "rgba(0,255,0,0.5)"
+                            }
+                        }
+                    </script>
+                </table>
+            </div>
+        </div>
+        <div class="forTable">
+            <div class="container">
+            <table class="Table_static">
+                <caption>Информация об узлах</caption>
+                {{range .HostsInfo}}
+                <tr class="upTH">
+                    <td>Параметры</td>
+                    <td>Значения</td>
+                    <td>Последнее обновление</td>
+                </tr>
+                <tr>
+                    <td>Среднее за минуту</td>
+                    <td>{{.Value_percpu_avg1}}</td>
+                    <td>{{.Time_percpu_avg1}}</td>
+                </tr>
+                <tr>
+                    <td>Среднее за 5 минут</td>
+                    <td>{{.Value_percpu_avg5}}</td>
+                    <td>{{.Time_percpu_avg5}}</td>
+                </tr>
+                <tr>
+                    <td>Среднее за 15 минут</td>
+                    <td>{{.Value_percpu_avg15}}</td>
+                    <td>{{.Time_percpu_avg15}}</td>
+                </tr>
+                <tr>
+                    <td>Свободное место на диске</td>
+                    <td>{{.Value_size_free}}</td>
+                    <td>{{.Time_size_free}}</td>
+                </tr>
+                <tr>
+                    <td>Объем диска</td>
+                    <td>{{.Value_size_total}}</td>
+                    <td>{{.Time_size_total}}</td>
+                </tr>
+                <tr>
+                    <td>Свободно ОЗУ</td>
+                    <td>{{.Value_memory_available}}</td>
+                    <td>{{.Time_memory_available}}</td>
+                </tr>
+                <tr>
+                    <td>Всего ОЗУ</td>
+                    <td>{{.Value_memory_total}}</td>
+                    <td>{{.Time_memory_total}}</td>
+                </tr>
+                <tr>
+                    <td>ЦПУ в простое</td>
+                    <td>{{.Value_cpu_util_idle}}</td>
+                    <td>{{.Time_value_cpu_util_idle}}</td>
+                </tr>
+                <tr>
+                    <td>ЦПУ пользователя</td>
+                    <td>{{.Value_cpu_util_user}}</td>
+                    <td>{{.Time_cpu_util_user}}</td>
+                </tr>
+            </table>
+            {{end}}
+        </div>
+        </div>
+    </div>
+    <table class="Table">
+        <tr class="upTH">
+            <th>Журнал событий</th>
+        </tr>
+    </table>
+</div>
+</div>
+</body>
+</html>

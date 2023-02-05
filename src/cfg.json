@@ -1,0 +1,9 @@
+{
+  "host": "localhost",
+  "port": 5433,
+  "user": "postgres",
+  "password": "12345678",
+  "db_name": "zabbixAPI",
+  "refresh_seconds": "15",
+  "server_url": "localhost:8080"
+}

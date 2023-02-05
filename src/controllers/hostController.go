@@ -2,31 +2,41 @@ package controllers
 
 import (
 	"dbConnection"
-	"encoding/json"
-	"fmt"
+	"html/template"
 	"models"
 	"net/http"
+	"os"
 )
 
 //w http.ResponseWriter, r *http.Request
 
 func GetHosts(w http.ResponseWriter, r *http.Request) {
 	db := dbConnection.DB
-	rows, err := db.Query("select * from host")
+	rows, err := db.Query("select * from host_work")
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
 
-	var hosts []models.Host
+	var hosts []models.HostWork
 	for rows.Next() {
-		var host models.Host
-		err = rows.Scan(&host.Hostid, &host.Hostname)
+		var hostDB models.HostWorkDB
+		err = rows.Scan(&hostDB.Hostid, &hostDB.Name_host, &hostDB.Work_calculation,
+			&hostDB.Time_size_free, &hostDB.Time_size_total, &hostDB.Time_memory_total,
+			&hostDB.Time_memory_available, &hostDB.Time_cpu_util_user)
 		if err != nil {
 			panic(err)
 		}
+		var host models.HostWork
+		host.Hostid = hostDB.Hostid
+		host.Name_host = hostDB.Name_host
+		host.Work_calculation = hostDB.Work_calculation
 		hosts = append(hosts, host)
 	}
-	fmt.Println(hosts)
-	json.NewEncoder(w).Encode(hosts)
+	dir, _ := os.Getwd()
+	tmpl := template.Must(template.ParseFiles(dir + "/src/template/hostTemplate.html"))
+	err = tmpl.Execute(w, hosts)
+	if err != nil {
+		panic(err)
+	}
 }
